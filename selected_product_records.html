@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>选品记录页</title>
+  <style>
+    :root { --bg:#f5f7fb; --card:#fff; --text:#1f2937; --muted:#6b7280; --line:#e5e7eb; --shadow:0 10px 30px rgba(15,23,42,.08); --accent:#f59e0b; --red:#dc2626; } *{box-sizing:border-box;} body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang SC","Helvetica Neue",Arial,sans-serif;background:var(--bg);color:var(--text);} .container{width:min(1360px,calc(100% - 24px));margin:0 auto;padding:24px 0 40px;} .hero,.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);} .hero{padding:24px;margin-bottom:18px;} .tag{display:inline-block;padding:6px 10px;border-radius:999px;background:#eff6ff;color:#1d4ed8;font-size:12px;font-weight:700;} h1{margin:12px 0 8px;font-size:32px;line-height:1.2;} .sub{margin:0;color:var(--muted);font-size:14px;line-height:1.8;} .actions{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;} .link-btn,button{border:1px solid var(--line);background:#fff;color:var(--text);border-radius:10px;padding:10px 14px;font-size:14px;font-weight:700;text-decoration:none;cursor:pointer;} .danger{color:#fff;background:var(--red);border-color:var(--red);} .primary{background:var(--accent);color:#fff;border-color:var(--accent);} .panel{padding:20px;} .table-wrap{overflow:auto;} table{width:100%;border-collapse:collapse;min-width:1700px;} th,td{border-bottom:1px solid var(--line);padding:12px 10px;text-align:left;font-size:13px;vertical-align:top;} th{background:#fff7ed;color:#9a3412;} .row-actions{display:flex;gap:8px;flex-wrap:wrap;} .mini-btn{padding:6px 10px;border-radius:8px;font-size:12px;font-weight:700;border:1px solid var(--line);background:#fff;cursor:pointer;} .mini-danger{background:#fef2f2;color:#b91c1c;border-color:#fecaca;} .edit-row input,.edit-row textarea{width:100%;border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:12px;} .edit-row textarea{min-height:70px;resize:vertical;} .status{margin-top:12px;padding:10px 12px;border-radius:10px;background:#f9fafb;border:1px solid var(--line);color:#374151;font-size:13px;line-height:1.7;} </style>
+</head>
+<body>
+  <div class="container">
+    <section class="hero">
+      <div class="tag">独立记录页</div>
+      <h1>选品记录</h1>
+      <p class="sub">这里单独展示所有已保存的选品记录。每一行都支持修改和删除。</p>
+      <div class="actions">
+        <a class="link-btn" href="./pricing_profit_calculator.html">返回利润测算页</a>
+        <a class="link-btn" href="./selected_product_form.html">返回选品表单页</a>
+        <button id="clearRecordsBtn" class="danger">清空全部记录</button>
+      </div>
+    </section>
+    <section class="panel">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>操作</th>
+              <th>选品日期</th>
+              <th>类目</th>
+              <th>竞品链接</th>
+              <th>图片链接</th>
+              <th>前台定价(CNY)</th>
+              <th>前台定价(NGN)</th>
+              <th>前台定价(USD)</th>
+              <th>利润(CNY，不含税)</th>
+              <th>利润率(不含税)</th>
+              <th>利润(CNY，扣税后)</th>
+              <th>利润率(扣税后)</th>
+              <th>备注</th>
+            </tr>
+          </thead>
+          <tbody id="recordsBody"></tbody>
+        </table>
+      </div>
+      <div class="status" id="statusText">正在读取记录...</div>
+    </section>
+  </div>
+  <script>
+    const LIST_KEY='jumia_selected_product_records';
+    const $=id=>document.getElementById(id);
+
+    function getRecords(){ return JSON.parse(localStorage.getItem(LIST_KEY)||'[]'); }
+    function setRecords(records){ localStorage.setItem(LIST_KEY, JSON.stringify(records)); }
+
+    function renderRecords(){
+      const records=getRecords();
+      const body=$('recordsBody');
+      if(!records.length){
+        body.innerHTML='<tr><td colspan="13">暂无已保存记录</td></tr>';
+        $('statusText').textContent='当前没有已保存记录。';
+        return;
+      }
+      body.innerHTML=records.map((item,index)=>`<tr>
+        <td><div class="row-actions"><button class="mini-btn" data-action="edit" data-index="${index}">修改</button><button class="mini-btn mini-danger" data-action="delete" data-index="${index}">删除</button></div></td>
+        <td>${item.selectedDate||''}</td>
+        <td>${item.category||''}</td>
+        <td>${item.competitorLink||''}</td>
+        <td>${item.imageLink||''}</td>
+        <td>${item.priceCny||''}</td>
+        <td>${item.priceNgn||''}</td>
+        <td>${item.priceUsd||''}</td>
+        <td>${item.profitNoTax||''}</td>
+        <td>${item.profitRateNoTax||''}</td>
+        <td>${item.profitAfterTax||''}</td>
+        <td>${item.profitRateAfterTax||''}</td>
+        <td>${item.notes||''}</td>
+      </tr>`).join('');
+      $('statusText').textContent=`当前共 ${records.length} 条选品记录。`;
+      bindRowActions();
+    }
+
+    function bindRowActions(){
+      document.querySelectorAll('[data-action="delete"]').forEach(btn=>{
+        btn.addEventListener('click',()=>deleteRecord(Number(btn.dataset.index)));
+      });
+      document.querySelectorAll('[data-action="edit"]').forEach(btn=>{
+        btn.addEventListener('click',()=>editRecord(Number(btn.dataset.index)));
+      });
+    }
+
+    function deleteRecord(index){
+      const records=getRecords();
+      records.splice(index,1);
+      setRecords(records);
+      renderRecords();
+    }
+
+    function editRecord(index){
+      const records=getRecords();
+      const item=records[index];
+      const body=$('recordsBody');
+      body.innerHTML=records.map((row,i)=>{
+        if(i!==index){
+          return `<tr>
+            <td><div class="row-actions"><button class="mini-btn" data-action="edit" data-index="${i}">修改</button><button class="mini-btn mini-danger" data-action="delete" data-index="${i}">删除</button></div></td>
+            <td>${row.selectedDate||''}</td>
+            <td>${row.category||''}</td>
+            <td>${row.competitorLink||''}</td>
+            <td>${row.imageLink||''}</td>
+            <td>${row.priceCny||''}</td>
+            <td>${row.priceNgn||''}</td>
+            <td>${row.priceUsd||''}</td>
+            <td>${row.profitNoTax||''}</td>
+            <td>${row.profitRateNoTax||''}</td>
+            <td>${row.profitAfterTax||''}</td>
+            <td>${row.profitRateAfterTax||''}</td>
+            <td>${row.notes||''}</td>
+          </tr>`;
+        }
+        return `<tr class="edit-row">
+          <td><div class="row-actions"><button class="mini-btn primary" id="saveEditBtn">保存</button><button class="mini-btn" id="cancelEditBtn">取消</button></div></td>
+          <td><input id="edit_selectedDate" type="date" value="${item.selectedDate||''}" /></td>
+          <td><input id="edit_category" value="${item.category||''}" /></td>
+          <td><input id="edit_competitorLink" value="${item.competitorLink||''}" /></td>
+          <td><input id="edit_imageLink" value="${item.imageLink||''}" /></td>
+          <td><input id="edit_priceCny" value="${item.priceCny||''}" /></td>
+          <td><input id="edit_priceNgn" value="${item.priceNgn||''}" /></td>
+          <td><input id="edit_priceUsd" value="${item.priceUsd||''}" /></td>
+          <td><input id="edit_profitNoTax" value="${item.profitNoTax||''}" /></td>
+          <td><input id="edit_profitRateNoTax" value="${item.profitRateNoTax||''}" /></td>
+          <td><input id="edit_profitAfterTax" value="${item.profitAfterTax||''}" /></td>
+          <td><input id="edit_profitRateAfterTax" value="${item.profitRateAfterTax||''}" /></td>
+          <td><textarea id="edit_notes">${item.notes||''}</textarea></td>
+        </tr>`;
+      }).join('');
+      bindRowActions();
+      $('saveEditBtn').addEventListener('click',()=>saveEdit(index));
+      $('cancelEditBtn').addEventListener('click',renderRecords);
+    }
+
+    function saveEdit(index){
+      const records=getRecords();
+      records[index]={
+        ...records[index],
+        selectedDate:$('edit_selectedDate').value,
+        category:$('edit_category').value,
+        competitorLink:$('edit_competitorLink').value,
+        imageLink:$('edit_imageLink').value,
+        priceCny:$('edit_priceCny').value,
+        priceNgn:$('edit_priceNgn').value,
+        priceUsd:$('edit_priceUsd').value,
+        profitNoTax:$('edit_profitNoTax').value,
+        profitRateNoTax:$('edit_profitRateNoTax').value,
+        profitAfterTax:$('edit_profitAfterTax').value,
+        profitRateAfterTax:$('edit_profitRateAfterTax').value,
+        notes:$('edit_notes').value
+      };
+      setRecords(records);
+      renderRecords();
+    }
+
+    $('clearRecordsBtn').addEventListener('click',()=>{ localStorage.removeItem(LIST_KEY); renderRecords(); });
+    renderRecords();
+  </script>
+</body>
+</html>

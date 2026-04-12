@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>2026 Jumia 利润测算</title>
+  <style>
+    :root { --bg:#f5f7fb; --card:#fff; --text:#1f2937; --muted:#6b7280; --line:#e5e7eb; --accent:#f59e0b; --green:#059669; --red:#dc2626; --shadow:0 10px 30px rgba(15,23,42,.08);} *{box-sizing:border-box;} body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang SC","Helvetica Neue",Arial,sans-serif;background:var(--bg);color:var(--text);} .container{width:min(1180px,calc(100% - 24px));margin:0 auto;padding:24px 0 40px;} .hero,.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);} .hero{padding:24px;margin-bottom:18px;} .tag{display:inline-block;padding:6px 10px;border-radius:999px;background:#fff7ed;color:#b45309;font-size:12px;font-weight:700;} h1{margin:12px 0 8px;font-size:32px;line-height:1.2;} .sub{margin:0;color:var(--muted);font-size:14px;line-height:1.8;} .layout{display:grid;grid-template-columns:1.05fr .95fr;gap:18px;} .panel{padding:20px;} .panel h2{margin:0 0 14px;font-size:20px;} .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;} .field{display:flex;flex-direction:column;gap:6px;} .field label{font-size:13px;color:var(--muted);} .field input,.field select{width:100%;height:42px;border:1px solid var(--line);border-radius:10px;padding:0 12px;font-size:14px;background:#fff;color:var(--text);outline:none;} .field input:focus,.field select:focus{border-color:#fbbf24;box-shadow:0 0 0 3px rgba(245,158,11,.12);} .field input[readonly]{background:#f9fafb;color:#374151;} .full{grid-column:1/-1;} .actions{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;} button,.link-btn{border:0;border-radius:10px;padding:10px 14px;font-size:14px;font-weight:700;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;} .primary{background:var(--accent);color:#fff;} .ghost,.link-btn{background:#fff;color:var(--text);border:1px solid var(--line);} .status{margin-top:14px;padding:10px 12px;border-radius:10px;background:#fffbeb;border:1px solid #fde68a;color:#92400e;font-size:13px;line-height:1.7;} .metrics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;} .metric{border:1px solid var(--line);border-radius:14px;padding:14px;background:#fcfcfd;} .metric .label{font-size:12px;color:var(--muted);margin-bottom:8px;} .metric .value{font-size:24px;font-weight:800;line-height:1.2;} .metric .hint{margin-top:8px;font-size:12px;color:var(--muted);line-height:1.6;} .good{color:var(--green);} .bad{color:var(--red);} .formula-box{margin-top:16px;border:1px solid var(--line);border-radius:14px;padding:14px;background:#fafafa;} .formula-box h3{margin:0 0 10px;font-size:15px;} .formula-box code{white-space:pre-wrap;word-break:break-word;font-size:12px;line-height:1.8;color:#92400e;display:block;} @media (max-width:980px){.layout{grid-template-columns:1fr;}.grid,.metrics{grid-template-columns:1fr;}h1{font-size:28px;}}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <section class="hero">
+      <div class="tag">2026 版本</div>
+      <h1>Jumia 利润测算器</h1>
+      <p class="sub">测算完成后点击“确认选品”，数据会带到独立的选品表单页。记录表已拆分到第三个独立网页。</p>
+      <div class="actions">
+        <a class="link-btn" href="./selected_product_form.html">切换到选品表单页</a>
+        <a class="link-btn" href="./selected_product_records.html">切换到选品记录页</a>
+      </div>
+    </section>
+    <div class="layout">
+      <section class="panel">
+        <h2>参数输入</h2>
+        <div class="grid">
+          <div class="field full"><label for="category">类目（决定佣金率，使用 2026 数据）</label><select id="category"></select></div>
+          <div class="field full"><label for="outboundTier">出库费档位（使用 2026 数据）</label><select id="outboundTier"></select></div>
+          <div class="field full"><label for="storageTier">仓储费档位（Nigeria & Ivory Coast，使用 2026 数据）</label><select id="storageTier"></select></div>
+          <div class="field"><label for="costCny">成本(CNY)</label><input id="costCny" type="number" step="0.01" value="2.70" /></div>
+          <div class="field"><label for="weightG">产品重量(g)</label><input id="weightG" type="number" step="0.01" value="45" /></div>
+          <div class="field"><label for="competitorNgn">竞品定价(NGN)</label><input id="competitorNgn" type="number" step="0.01" value="6500" /></div>
+          <div class="field"><label for="commissionRate">佣金率（自动）</label><input id="commissionRate" type="number" step="0.0001" readonly /></div>
+          <div class="field"><label for="returnRate">退货率</label><input id="returnRate" type="number" step="0.0001" value="0.028" /></div>
+          <div class="field"><label for="taxRate">HK 利得税率</label><input id="taxRate" type="number" step="0.0001" value="0.085" /></div>
+          <div class="field"><label for="warehouseFeeUsdPerDay">仓储费(USD/件/天，自动)</label><input id="warehouseFeeUsdPerDay" type="number" step="0.00001" readonly /></div>
+          <div class="field"><label for="storageDays">仓储天数</label><input id="storageDays" type="number" step="1" value="7" /></div>
+          <div class="field"><label for="fulfillmentFeeUsd">妥投出库费(USD/件，自动)</label><input id="fulfillmentFeeUsd" type="number" step="0.0001" readonly /></div>
+          <div class="field"><label for="airFreightPerGram">空运费(CNY/g)</label><input id="airFreightPerGram" type="number" step="0.000001" value="0.050881" /></div>
+          <div class="field"><label for="usdCny">汇率 USD-CNY</label><input id="usdCny" type="number" step="0.0001" value="6.97" /></div>
+          <div class="field"><label for="usdNgn">汇率 USD-NGN</label><input id="usdNgn" type="number" step="0.0001" value="1422.68" /></div>
+          <div class="field"><label for="cnyNgn">汇率 CNY-NGN</label><input id="cnyNgn" type="number" step="0.0001" value="203.67" /></div>
+        </div>
+        <div class="actions">
+          <button class="primary" id="calculateBtn">立即计算</button>
+          <button class="primary" id="saveProductBtn">确认选品</button>
+          <button class="ghost" id="resetBtn">恢复默认</button>
+        </div>
+        <div class="status" id="statusText">当前使用的是 2026 年数据。点击“确认选品”后，会把当前结果保存到选品表单页。</div>
+      </section>
+      <section class="panel">
+        <h2>计算结果</h2>
+        <div class="metrics">
+          <div class="metric"><div class="label">前台定价(CNY)</div><div class="value" id="priceCny">0.00</div><div class="hint">竞品 NGN 售价按汇率换算</div></div>
+          <div class="metric"><div class="label">前台定价(NGN)</div><div class="value" id="priceNgn">0.00</div><div class="hint">当前前台定价 NGN</div></div>
+          <div class="metric"><div class="label">前台定价(USD)</div><div class="value" id="priceUsd">0.00</div><div class="hint">竞品 NGN 售价按 USD 汇率换算</div></div>
+          <div class="metric"><div class="label">运费(CNY)</div><div class="value" id="airFreightCny">0.00</div><div class="hint">重量 × 空运费</div></div>
+          <div class="metric"><div class="label">仓储费(CNY)</div><div class="value" id="warehouseCny">0.00</div><div class="hint">仓储费(USD/天) × 天数 × USD-CNY</div></div>
+          <div class="metric"><div class="label">妥投出库费(CNY)</div><div class="value" id="fulfillmentCny">0.00</div><div class="hint">出库费(USD) × USD-CNY</div></div>
+          <div class="metric"><div class="label">毛利率</div><div class="value" id="grossMargin">0.00%</div><div class="hint">(售价-成本)/售价</div></div>
+          <div class="metric"><div class="label">利润(CNY，不含税)</div><div class="value" id="profitNoTax">0.00</div><div class="hint">扣佣金、退货、物流、仓储、出库后</div></div>
+          <div class="metric"><div class="label">利润率(不含税)</div><div class="value" id="profitRateNoTax">0.00%</div><div class="hint">利润 / 售价</div></div>
+          <div class="metric"><div class="label">利润(CNY，扣税后)</div><div class="value" id="profitAfterTax">0.00</div><div class="hint">加入 HK 税率后</div></div>
+          <div class="metric"><div class="label">利润率(扣税后)</div><div class="value" id="profitRateAfterTax">0.00%</div><div class="hint">税后利润 / 售价</div></div>
+        </div>
+      </section>
+    </div>
+  </div>
+  <script>
+    const categoryCommission2026={'Auto & Moto / 汽车与摩托车':0.20,'Baby Products / 婴儿用品':0.20,'Beauty Appliances / 美容电器':0.15,'Books, Movies & Music / 图书、影视与音乐':0.20,'Cameras / 相机':0.10,'Electronics Accessories / 电子配件':0.20,'Fashion / 时尚':0.20,'Fashion Accessories / 时尚配饰':0.20,'Generators / 发电机':0.11,'Grocery / 食品杂货':0.20,'Health & Beauty / 健康与美容':0.20,'Home / 家居用品':0.20,'Laptops, Desktops & Monitors / 笔记本电脑、台式机及显示器':0.10,'Large Appliances / 大型家电':0.10,'Luggage & Travel Gear / 箱包与旅行装备':0.20,'Mobile Phones / 移动电话':0.06,'Musical Instruments / 乐器':0.20,'Small Appliances / 小型家电':0.12,'Sporting Goods / 体育用品':0.20,'Sportswear / 运动服饰':0.17,'Tablets / 平板电脑':0.11,'Televisions / 电视机':0.08,'Toys & Games / 玩具与游戏':0.15};
+    const outboundFee2026={'Large / 大号':2.5,'Medium / 中号':0.9,'Small - Fashion / 小号-时尚类':0.25,'Small - Sportswear / 小号-运动服饰类':0.25,'Small - Home / 小号-家居用品类':0.25,'Small - Others / 小号-其他类':0.4};
+    const storageFee2026={'Xtra Small / 超小':0.00203,'Small / 小':0.00709,'Medium / 中':0.01890,'TV / 电视':0.05000,'Large / 大':0.05000};
+    const defaults={category:'Fashion / 时尚',outboundTier:'Small - Fashion / 小号-时尚类',storageTier:'Small / 小',costCny:2.70,weightG:45,competitorNgn:6500,returnRate:0.028,taxRate:0.085,storageDays:7,airFreightPerGram:0.050881,usdCny:6.97,usdNgn:1422.68,cnyNgn:203.67};
+    const $=id=>document.getElementById(id);
+    function fillSelect(id,options,selectedValue){$(id).innerHTML=Object.entries(options).map(([label])=>`<option value="${label}" ${label===selectedValue?'selected':''}>${label}</option>`).join('');}
+    function formatMoney(num){return Number(num||0).toFixed(2);} function formatPercent(num){return `${(Number(num||0)*100).toFixed(2)}%`;}
+    function setMetric(id,value,isPercent=false){const el=$(id);el.textContent=isPercent?formatPercent(value):formatMoney(value);el.classList.remove('good','bad');if(id.toLowerCase().includes('profit')){if(value>0)el.classList.add('good');if(value<0)el.classList.add('bad');}}
+    function syncAutoFields(){$('commissionRate').value=categoryCommission2026[$('category').value]??0;$('fulfillmentFeeUsd').value=outboundFee2026[$('outboundTier').value]??0;$('warehouseFeeUsdPerDay').value=storageFee2026[$('storageTier').value]??0;$('statusText').textContent=`当前使用 2026 规则：类目=${$('category').value}，出库档位=${$('outboundTier').value}，仓储档位=${$('storageTier').value}`;}
+    function readNumber(id){return Number($(id).value||0);}
+    function calculate(){syncAutoFields();const costCny=readNumber('costCny');const weightG=readNumber('weightG');const competitorNgn=readNumber('competitorNgn');const commissionRate=readNumber('commissionRate');const returnRate=readNumber('returnRate');const taxRate=readNumber('taxRate');const warehouseFeeUsdPerDay=readNumber('warehouseFeeUsdPerDay');const storageDays=readNumber('storageDays');const fulfillmentFeeUsd=readNumber('fulfillmentFeeUsd');const airFreightPerGram=readNumber('airFreightPerGram');const usdCny=readNumber('usdCny');const usdNgn=readNumber('usdNgn');const cnyNgn=readNumber('cnyNgn');const priceCny=cnyNgn?competitorNgn/cnyNgn:0;const priceNgn=competitorNgn;const priceUsd=usdNgn?competitorNgn/usdNgn:0;const airFreightCny=weightG*airFreightPerGram;const warehouseCny=warehouseFeeUsdPerDay*storageDays*usdCny;const fulfillmentCny=fulfillmentFeeUsd*usdCny;const grossMargin=priceCny?(priceCny-costCny)/priceCny:0;const profitNoTax=priceCny-priceCny*(returnRate+commissionRate)-airFreightCny-warehouseCny-fulfillmentCny-costCny;const profitRateNoTax=priceCny?profitNoTax/priceCny:0;const profitAfterTax=priceCny-priceCny*(returnRate+commissionRate+taxRate)-airFreightCny-warehouseCny-fulfillmentCny-costCny;const profitRateAfterTax=priceCny?profitAfterTax/priceCny:0;setMetric('priceCny',priceCny);setMetric('priceNgn',priceNgn);setMetric('priceUsd',priceUsd);setMetric('airFreightCny',airFreightCny);setMetric('warehouseCny',warehouseCny);setMetric('fulfillmentCny',fulfillmentCny);setMetric('grossMargin',grossMargin,true);setMetric('profitNoTax',profitNoTax);setMetric('profitRateNoTax',profitRateNoTax,true);setMetric('profitAfterTax',profitAfterTax);setMetric('profitRateAfterTax',profitRateAfterTax,true);}
+    function saveCurrentProduct(){calculate();const payload={selectedAt:new Date().toISOString(),category:$('category').value,outboundTier:$('outboundTier').value,storageTier:$('storageTier').value,costCny:readNumber('costCny'),weightG:readNumber('weightG'),competitorNgn:readNumber('competitorNgn'),commissionRate:readNumber('commissionRate'),returnRate:readNumber('returnRate'),taxRate:readNumber('taxRate'),warehouseFeeUsdPerDay:readNumber('warehouseFeeUsdPerDay'),storageDays:readNumber('storageDays'),fulfillmentFeeUsd:readNumber('fulfillmentFeeUsd'),airFreightPerGram:readNumber('airFreightPerGram'),usdCny:readNumber('usdCny'),usdNgn:readNumber('usdNgn'),cnyNgn:readNumber('cnyNgn'),priceCny:$('priceCny').textContent,priceNgn:$('priceNgn').textContent,priceUsd:$('priceUsd').textContent,airFreightCny:$('airFreightCny').textContent,warehouseCny:$('warehouseCny').textContent,fulfillmentCny:$('fulfillmentCny').textContent,grossMargin:$('grossMargin').textContent,profitNoTax:$('profitNoTax').textContent,profitRateNoTax:$('profitRateNoTax').textContent,profitAfterTax:$('profitAfterTax').textContent,profitRateAfterTax:$('profitRateAfterTax').textContent};localStorage.setItem('jumia_selected_product_draft',JSON.stringify(payload));window.location.href='./selected_product_form.html';}
+    function init(){fillSelect('category',categoryCommission2026,defaults.category);fillSelect('outboundTier',outboundFee2026,defaults.outboundTier);fillSelect('storageTier',storageFee2026,defaults.storageTier);$('costCny').value=defaults.costCny;$('weightG').value=defaults.weightG;$('competitorNgn').value=defaults.competitorNgn;$('returnRate').value=defaults.returnRate;$('taxRate').value=defaults.taxRate;$('storageDays').value=defaults.storageDays;$('airFreightPerGram').value=defaults.airFreightPerGram;$('usdCny').value=defaults.usdCny;$('usdNgn').value=defaults.usdNgn;$('cnyNgn').value=defaults.cnyNgn;['category','outboundTier','storageTier','costCny','weightG','competitorNgn','returnRate','taxRate','storageDays','airFreightPerGram','usdCny','usdNgn','cnyNgn'].forEach(id=>$(id).addEventListener('input',calculate));$('calculateBtn').addEventListener('click',calculate);$('saveProductBtn').addEventListener('click',saveCurrentProduct);$('resetBtn').addEventListener('click',()=>init());calculate();}
+    init();
+  </script>
+</body>
+</html>
