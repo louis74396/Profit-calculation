@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>选品确认表单</title>
+  <style>
+    :root { --bg:#f5f7fb; --card:#fff; --text:#1f2937; --muted:#6b7280; --line:#e5e7eb; --accent:#f59e0b; --shadow:0 10px 30px rgba(15,23,42,.08);} *{box-sizing:border-box;} body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang SC","Helvetica Neue",Arial,sans-serif;background:var(--bg);color:var(--text);} .container{width:min(1180px,calc(100% - 24px));margin:0 auto;padding:24px 0 40px;} .hero,.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);} .hero{padding:24px;margin-bottom:18px;} .tag{display:inline-block;padding:6px 10px;border-radius:999px;background:#ecfdf5;color:#047857;font-size:12px;font-weight:700;} h1{margin:12px 0 8px;font-size:32px;line-height:1.2;} .sub{margin:0;color:var(--muted);font-size:14px;line-height:1.8;} .actions{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;} .link-btn,button{border:1px solid var(--line);background:#fff;color:var(--text);border-radius:10px;padding:10px 14px;font-size:14px;font-weight:700;text-decoration:none;cursor:pointer;} .primary{background:var(--accent);color:#fff;border-color:var(--accent);} .panel{padding:20px;} .panel h2{margin:0 0 14px;font-size:20px;} .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;} .field{display:flex;flex-direction:column;gap:6px;} .field label{font-size:13px;color:var(--muted);} .field input,.field textarea{width:100%;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:14px;background:#fff;color:var(--text);outline:none;} .field textarea{min-height:110px;resize:vertical;} .field input:focus,.field textarea:focus{border-color:#fbbf24;box-shadow:0 0 0 3px rgba(245,158,11,.12);} .field input[readonly]{background:#f9fafb;} .full{grid-column:1/-1;} .status{margin-top:12px;padding:10px 12px;border-radius:10px;background:#eff6ff;border:1px solid #bfdbfe;color:#1d4ed8;font-size:13px;line-height:1.7;} @media (max-width:980px){.grid{grid-template-columns:1fr;}h1{font-size:28px;}}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <section class="hero">
+      <div class="tag">选品确认页</div>
+      <h1>选品表单</h1>
+      <p class="sub">这里用于确认单条选品信息。保存后的记录会进入独立的“选品记录页”。</p>
+      <div class="actions">
+        <a class="link-btn" href="./pricing_profit_calculator.html">返回利润测算页</a>
+        <a class="link-btn" href="./selected_product_records.html">切换到选品记录页</a>
+        <button class="primary" id="saveRecordBtn">保存到记录页</button>
+        <button id="clearDraftBtn">清空当前草稿</button>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>当前选品信息</h2>
+      <div class="grid">
+        <div class="field"><label for="selectedDate">选品日期</label><input id="selectedDate" type="date" /></div>
+        <div class="field"><label for="category">产品类目</label><input id="category" type="text" readonly /></div>
+        <div class="field full"><label for="competitorLink">竞品链接</label><input id="competitorLink" type="text" placeholder="请输入竞品链接" /></div>
+        <div class="field full"><label for="imageLink">图片链接</label><input id="imageLink" type="text" placeholder="请输入图片链接，或粘贴图片地址" /></div>
+        <div class="field full"><label for="notes">备注</label><textarea id="notes" placeholder="可填写选品判断、补充说明、风险点"></textarea></div>
+        <div class="field"><label>前台定价(CNY)</label><input id="priceCny" type="text" readonly /></div>
+        <div class="field"><label>前台定价(NGN)</label><input id="priceNgn" type="text" readonly /></div>
+        <div class="field"><label>前台定价(USD)</label><input id="priceUsd" type="text" readonly /></div>
+        <div class="field"><label>利润(CNY，不含税)</label><input id="profitNoTax" type="text" readonly /></div>
+        <div class="field"><label>利润率(不含税)</label><input id="profitRateNoTax" type="text" readonly /></div>
+        <div class="field"><label>利润(CNY，扣税后)</label><input id="profitAfterTax" type="text" readonly /></div>
+        <div class="field"><label>利润率(扣税后)</label><input id="profitRateAfterTax" type="text" readonly /></div>
+        <div class="field"><label>佣金率</label><input id="commissionRate" type="text" readonly /></div>
+        <div class="field"><label>妥投出库费(CNY)</label><input id="fulfillmentCny" type="text" readonly /></div>
+        <div class="field"><label>仓储费(CNY)</label><input id="warehouseCny" type="text" readonly /></div>
+        <div class="field"><label>运费(CNY)</label><input id="airFreightCny" type="text" readonly /></div>
+      </div>
+      <div class="status" id="statusText">等待从利润测算页带入数据。</div>
+    </section>
+  </div>
+  <script>
+    const $=id=>document.getElementById(id); const DRAFT_KEY='jumia_selected_product_draft'; const LIST_KEY='jumia_selected_product_records';
+    function today(){return new Date().toISOString().slice(0,10);} 
+    function loadDraft(){const raw=localStorage.getItem(DRAFT_KEY);$('selectedDate').value=today(); if(!raw){$('statusText').textContent='当前没有从利润测算页传入的新数据。';return;} const data=JSON.parse(raw); $('category').value=data.category||''; $('priceCny').value=data.priceCny||''; $('priceNgn').value=data.priceNgn||''; $('priceUsd').value=data.priceUsd||''; $('profitNoTax').value=data.profitNoTax||''; $('profitRateNoTax').value=data.profitRateNoTax||''; $('profitAfterTax').value=data.profitAfterTax||''; $('profitRateAfterTax').value=data.profitRateAfterTax||''; $('commissionRate').value=data.commissionRate??''; $('fulfillmentCny').value=data.fulfillmentCny||''; $('warehouseCny').value=data.warehouseCny||''; $('airFreightCny').value=data.airFreightCny||''; $('statusText').textContent='已读取利润测算页传来的最新选品数据。请补充日期、竞品链接、图片链接后保存。'; }
+    function saveRecord(){const draft=JSON.parse(localStorage.getItem(DRAFT_KEY)||'{}'); const record={...draft,selectedDate:$('selectedDate').value,competitorLink:$('competitorLink').value.trim(),imageLink:$('imageLink').value.trim(),notes:$('notes').value.trim()}; const list=JSON.parse(localStorage.getItem(LIST_KEY)||'[]'); list.unshift(record); localStorage.setItem(LIST_KEY,JSON.stringify(list)); $('statusText').textContent='已保存到选品记录页。'; window.location.href='./selected_product_records.html'; }
+    function clearDraft(){localStorage.removeItem(DRAFT_KEY); $('selectedDate').value=today(); $('category').value=''; $('competitorLink').value=''; $('imageLink').value=''; $('notes').value=''; ['priceCny','priceNgn','priceUsd','profitNoTax','profitRateNoTax','profitAfterTax','profitRateAfterTax','commissionRate','fulfillmentCny','warehouseCny','airFreightCny'].forEach(id=>$(id).value=''); $('statusText').textContent='当前草稿已清空。';}
+    $('saveRecordBtn').addEventListener('click',saveRecord); $('clearDraftBtn').addEventListener('click',clearDraft); loadDraft();
+  </script>
+</body>
+</html>
