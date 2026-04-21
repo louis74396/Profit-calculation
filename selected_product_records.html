@@ -29,6 +29,9 @@
               <th>类目</th>
               <th>竞品链接</th>
               <th>图片链接</th>
+              <th>重量</th>
+              <th>体积</th>
+              <th>长宽高</th>
               <th>前台定价(CNY)</th>
               <th>前台定价(NGN)</th>
               <th>前台定价(USD)</th>
@@ -56,7 +59,7 @@
       const records=getRecords();
       const body=$('recordsBody');
       if(!records.length){
-        body.innerHTML='<tr><td colspan="13">暂无已保存记录</td></tr>';
+        body.innerHTML='<tr><td colspan="16">暂无已保存记录</td></tr>';
         $('statusText').textContent='当前没有已保存记录。';
         return;
       }
@@ -66,6 +69,9 @@
         <td>${item.category||''}</td>
         <td>${item.competitorLink||''}</td>
         <td>${item.imageLink||''}</td>
+        <td>${item.weight||''}</td>
+        <td>${item.volume||''}</td>
+        <td>${item.dimensions||''}</td>
         <td>${item.priceCny||''}</td>
         <td>${item.priceNgn||''}</td>
         <td>${item.priceUsd||''}</td>
@@ -107,6 +113,9 @@
             <td>${row.category||''}</td>
             <td>${row.competitorLink||''}</td>
             <td>${row.imageLink||''}</td>
+            <td>${row.weight||''}</td>
+            <td>${row.volume||''}</td>
+            <td>${row.dimensions||''}</td>
             <td>${row.priceCny||''}</td>
             <td>${row.priceNgn||''}</td>
             <td>${row.priceUsd||''}</td>
@@ -123,6 +132,9 @@
           <td><input id="edit_category" value="${item.category||''}" /></td>
           <td><input id="edit_competitorLink" value="${item.competitorLink||''}" /></td>
           <td><input id="edit_imageLink" value="${item.imageLink||''}" /></td>
+          <td><input id="edit_weight" value="${item.weight||''}" /></td>
+          <td><input id="edit_volume" value="${item.volume||''}" /></td>
+          <td><input id="edit_dimensions" value="${item.dimensions||''}" /></td>
           <td><input id="edit_priceCny" value="${item.priceCny||''}" /></td>
           <td><input id="edit_priceNgn" value="${item.priceNgn||''}" /></td>
           <td><input id="edit_priceUsd" value="${item.priceUsd||''}" /></td>
@@ -146,6 +158,9 @@
         category:$('edit_category').value,
         competitorLink:$('edit_competitorLink').value,
         imageLink:$('edit_imageLink').value,
+        weight:$('edit_weight').value,
+        volume:$('edit_volume').value,
+        dimensions:$('edit_dimensions').value,
         priceCny:$('edit_priceCny').value,
         priceNgn:$('edit_priceNgn').value,
         priceUsd:$('edit_priceUsd').value,

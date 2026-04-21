@@ -5,7 +5,388 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>2026 Jumia 利润测算</title>
   <style>
-    :root { --bg:#f5f7fb; --card:#fff; --text:#1f2937; --muted:#6b7280; --line:#e5e7eb; --accent:#f59e0b; --green:#059669; --red:#dc2626; --shadow:0 10px 30px rgba(15,23,42,.08);} *{box-sizing:border-box;} body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang SC","Helvetica Neue",Arial,sans-serif;background:var(--bg);color:var(--text);} .container{width:min(1180px,calc(100% - 24px));margin:0 auto;padding:24px 0 40px;} .hero,.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);} .hero{padding:24px;margin-bottom:18px;} .tag{display:inline-block;padding:6px 10px;border-radius:999px;background:#fff7ed;color:#b45309;font-size:12px;font-weight:700;} h1{margin:12px 0 8px;font-size:32px;line-height:1.2;} .sub{margin:0;color:var(--muted);font-size:14px;line-height:1.8;} .layout{display:grid;grid-template-columns:1.05fr .95fr;gap:18px;} .panel{padding:20px;} .panel h2{margin:0 0 14px;font-size:20px;} .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;} .field{display:flex;flex-direction:column;gap:6px;} .field label{font-size:13px;color:var(--muted);} .field input,.field select{width:100%;height:42px;border:1px solid var(--line);border-radius:10px;padding:0 12px;font-size:14px;background:#fff;color:var(--text);outline:none;} .field input:focus,.field select:focus{border-color:#fbbf24;box-shadow:0 0 0 3px rgba(245,158,11,.12);} .field input[readonly]{background:#f9fafb;color:#374151;} .full{grid-column:1/-1;} .actions{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;} button,.link-btn{border:0;border-radius:10px;padding:10px 14px;font-size:14px;font-weight:700;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;} .primary{background:var(--accent);color:#fff;} .ghost,.link-btn{background:#fff;color:var(--text);border:1px solid var(--line);} .status{margin-top:14px;padding:10px 12px;border-radius:10px;background:#fffbeb;border:1px solid #fde68a;color:#92400e;font-size:13px;line-height:1.7;} .metrics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;} .metric{border:1px solid var(--line);border-radius:14px;padding:14px;background:#fcfcfd;} .metric .label{font-size:12px;color:var(--muted);margin-bottom:8px;} .metric .value{font-size:24px;font-weight:800;line-height:1.2;} .metric .hint{margin-top:8px;font-size:12px;color:var(--muted);line-height:1.6;} .good{color:var(--green);} .bad{color:var(--red);} .formula-box{margin-top:16px;border:1px solid var(--line);border-radius:14px;padding:14px;background:#fafafa;} .formula-box h3{margin:0 0 10px;font-size:15px;} .formula-box code{white-space:pre-wrap;word-break:break-word;font-size:12px;line-height:1.8;color:#92400e;display:block;} @media (max-width:980px){.layout{grid-template-columns:1fr;}.grid,.metrics{grid-template-columns:1fr;}h1{font-size:28px;}}
+    :root {
+      --bg: #f5f7fb;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --line: #e5e7eb;
+      --accent: #f59e0b;
+      --accent-dark: #d97706;
+      --green: #059669;
+      --red: #dc2626;
+      --blue-bg: #eff6ff;
+      --blue-text: #1d4ed8;
+      --shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+      --radius-lg: 18px;
+      --radius-md: 14px;
+      --radius-sm: 10px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .container {
+      width: min(1180px, calc(100% - 24px));
+      margin: 0 auto;
+      padding: 24px 0 40px;
+    }
+
+    .hero,
+    .panel {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow);
+    }
+
+    .hero {
+      padding: 24px;
+      margin-bottom: 18px;
+    }
+
+    .tag {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: #fff7ed;
+      color: #b45309;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    h1 {
+      margin: 12px 0 8px;
+      font-size: 32px;
+      line-height: 1.2;
+    }
+
+    .sub {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.8;
+    }
+
+    .actions,
+    .nav-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 16px;
+      flex-wrap: wrap;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap: 18px;
+    }
+
+    .panel {
+      padding: 20px;
+    }
+
+    .panel-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+    }
+
+    .panel h2 {
+      margin: 0;
+      font-size: 20px;
+    }
+
+    .hint {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .summary-strip {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .summary-item {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      padding: 12px 14px;
+      background: #fcfcfd;
+    }
+
+    .summary-label {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    .summary-value {
+      font-size: 18px;
+      font-weight: 800;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .field label {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .field input,
+    .field select {
+      width: 100%;
+      height: 42px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      padding: 0 12px;
+      font-size: 14px;
+      background: #fff;
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .switch-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      min-height: 42px;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      background: #fff;
+    }
+
+    .switch-label-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .switch-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .switch-desc {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 52px;
+      height: 30px;
+      flex-shrink: 0;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+      position: absolute;
+    }
+
+    .slider {
+      position: absolute;
+      inset: 0;
+      cursor: pointer;
+      background: #d1d5db;
+      transition: 0.2s ease;
+      border-radius: 999px;
+    }
+
+    .slider:before {
+      content: '';
+      position: absolute;
+      height: 22px;
+      width: 22px;
+      left: 4px;
+      top: 4px;
+      background: #fff;
+      transition: 0.2s ease;
+      border-radius: 50%;
+      box-shadow: 0 2px 6px rgba(15, 23, 42, 0.18);
+    }
+
+    .switch input:checked + .slider {
+      background: var(--accent);
+    }
+
+    .switch input:checked + .slider:before {
+      transform: translateX(22px);
+    }
+
+    .field input:focus,
+    .field select:focus {
+      border-color: #fbbf24;
+      box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.12);
+    }
+
+    .field input[readonly] {
+      background: #f9fafb;
+      color: #374151;
+    }
+
+    .field-help {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .full {
+      grid-column: 1 / -1;
+    }
+
+    .btn,
+    button,
+    .link-btn {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      padding: 10px 14px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: #fff;
+      color: var(--text);
+      transition: 0.2s ease;
+    }
+
+    .btn:hover,
+    button:hover,
+    .link-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08);
+    }
+
+    .primary {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+
+    .primary:hover {
+      background: var(--accent-dark);
+      border-color: var(--accent-dark);
+    }
+
+    .status {
+      margin-top: 14px;
+      padding: 10px 12px;
+      border-radius: var(--radius-sm);
+      background: #fffbeb;
+      border: 1px solid #fde68a;
+      color: #92400e;
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .metric {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      padding: 14px;
+      background: #fcfcfd;
+    }
+
+    .metric .label {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    .metric .value {
+      font-size: 24px;
+      font-weight: 800;
+      line-height: 1.2;
+      word-break: break-word;
+    }
+
+    .metric .hint {
+      margin-top: 8px;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .good {
+      color: var(--green);
+    }
+
+    .bad {
+      color: var(--red);
+    }
+
+    .formula-box {
+      margin-top: 16px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      padding: 14px;
+      background: #fafafa;
+    }
+
+    .formula-box h3 {
+      margin: 0 0 10px;
+      font-size: 15px;
+    }
+
+    .formula-box code {
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-size: 12px;
+      line-height: 1.8;
+      color: #92400e;
+      display: block;
+    }
+
+    @media (max-width: 980px) {
+      .layout,
+      .grid,
+      .metrics,
+      .summary-strip {
+        grid-template-columns: 1fr;
+      }
+
+      h1 {
+        font-size: 28px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -13,72 +394,589 @@
     <section class="hero">
       <div class="tag">2026 版本</div>
       <h1>Jumia 利润测算器</h1>
-      <p class="sub">测算完成后点击“确认选品”，数据会带到独立的选品表单页。记录表已拆分到第三个独立网页。</p>
-      <div class="actions">
+      <p class="sub">先做利润判断，再把结果带入选品表单。这个版本已经和首页、选品表单、记录页做了统一衔接，更适合直接放进项目里管理。</p>
+
+      <div class="nav-actions">
+        <a class="link-btn" href="./index.html">返回首页</a>
         <a class="link-btn" href="./selected_product_form.html">切换到选品表单页</a>
         <a class="link-btn" href="./selected_product_records.html">切换到选品记录页</a>
       </div>
+
+      <div class="summary-strip">
+        <div class="summary-item">
+          <div class="summary-label">当前类目</div>
+          <div class="summary-value" id="summaryCategory">-</div>
+        </div>
+        <div class="summary-item">
+          <div class="summary-label">当前竞品价(NGN)</div>
+          <div class="summary-value" id="summaryCompetitorPrice">-</div>
+        </div>
+        <div class="summary-item">
+          <div class="summary-label">税后利润率</div>
+          <div class="summary-value" id="summaryProfitRateAfterTax">-</div>
+        </div>
+        <div class="summary-item">
+          <div class="summary-label">建议动作</div>
+          <div class="summary-value" id="summaryDecision">待计算</div>
+        </div>
+      </div>
     </section>
+
     <div class="layout">
       <section class="panel">
-        <h2>参数输入</h2>
+        <div class="panel-head">
+          <h2>参数输入</h2>
+          <div class="hint">建议先确认类目、出库档位、仓储档位，再录入成本和竞品价格。</div>
+        </div>
+
         <div class="grid">
-          <div class="field full"><label for="category">类目（决定佣金率，使用 2026 数据）</label><select id="category"></select></div>
-          <div class="field full"><label for="outboundTier">出库费档位（使用 2026 数据）</label><select id="outboundTier"></select></div>
-          <div class="field full"><label for="storageTier">仓储费档位（Nigeria & Ivory Coast，使用 2026 数据）</label><select id="storageTier"></select></div>
-          <div class="field"><label for="costCny">成本(CNY)</label><input id="costCny" type="number" step="0.01" value="2.70" /></div>
-          <div class="field"><label for="weightG">产品重量(g)</label><input id="weightG" type="number" step="0.01" value="45" /></div>
-          <div class="field"><label for="competitorNgn">竞品定价(NGN)</label><input id="competitorNgn" type="number" step="0.01" value="6500" /></div>
-          <div class="field"><label for="commissionRate">佣金率（自动）</label><input id="commissionRate" type="number" step="0.0001" readonly /></div>
-          <div class="field"><label for="returnRate">退货率</label><input id="returnRate" type="number" step="0.0001" value="0.028" /></div>
-          <div class="field"><label for="taxRate">HK 利得税率</label><input id="taxRate" type="number" step="0.0001" value="0.085" /></div>
-          <div class="field"><label for="warehouseFeeUsdPerDay">仓储费(USD/件/天，自动)</label><input id="warehouseFeeUsdPerDay" type="number" step="0.00001" readonly /></div>
-          <div class="field"><label for="storageDays">仓储天数</label><input id="storageDays" type="number" step="1" value="7" /></div>
-          <div class="field"><label for="fulfillmentFeeUsd">妥投出库费(USD/件，自动)</label><input id="fulfillmentFeeUsd" type="number" step="0.0001" readonly /></div>
-          <div class="field"><label for="airFreightPerGram">空运费(CNY/g)</label><input id="airFreightPerGram" type="number" step="0.000001" value="0.050881" /></div>
-          <div class="field"><label for="usdCny">汇率 USD-CNY</label><input id="usdCny" type="number" step="0.0001" value="6.97" /></div>
-          <div class="field"><label for="usdNgn">汇率 USD-NGN</label><input id="usdNgn" type="number" step="0.0001" value="1422.68" /></div>
-          <div class="field"><label for="cnyNgn">汇率 CNY-NGN</label><input id="cnyNgn" type="number" step="0.0001" value="203.67" /></div>
+          <div class="field full">
+            <label for="category">类目（决定佣金率，使用 2026 数据）</label>
+            <select id="category"></select>
+          </div>
+
+          <div class="field full">
+            <label for="outboundTier">出库费档位（使用 2026 数据）</label>
+            <select id="outboundTier"></select>
+          </div>
+
+          <div class="field full">
+            <label for="storageTier">仓储费档位（Nigeria & Ivory Coast，使用 2026 数据）</label>
+            <select id="storageTier"></select>
+          </div>
+
+          <div class="field">
+            <label for="costCny">成本(CNY)</label>
+            <input id="costCny" type="number" step="0.01" value="2.70" />
+          </div>
+
+          <div class="field">
+            <label for="weightG">产品重量(g)</label>
+            <input id="weightG" type="number" step="0.01" value="45" />
+          </div>
+
+          <div class="field">
+            <label for="competitorNgn">竞品定价(NGN)</label>
+            <input id="competitorNgn" type="number" step="0.01" value="6500" />
+          </div>
+
+          <div class="field">
+            <label for="commissionRate">佣金率（自动）</label>
+            <input id="commissionRate" type="number" step="0.0001" readonly />
+          </div>
+
+          <div class="field">
+            <label for="returnRate">退货率</label>
+            <input id="returnRate" type="number" step="0.0001" value="0.028" />
+            <div class="field-help">例如 0.028 = 2.8%</div>
+          </div>
+
+          <div class="field">
+            <label for="taxRate">HK 利得税率</label>
+            <input id="taxRate" type="number" step="0.0001" value="0.085" />
+          </div>
+
+          <div class="field">
+            <label for="warehouseFeeUsdPerDay">仓储费(USD/件/天，自动)</label>
+            <input id="warehouseFeeUsdPerDay" type="number" step="0.00001" readonly />
+          </div>
+
+          <div class="field">
+            <label for="storageDays">仓储天数</label>
+            <input id="storageDays" type="number" step="1" value="7" />
+          </div>
+
+          <div class="field">
+            <label for="fulfillmentFeeUsd">妥投出库费(USD/件，自动)</label>
+            <input id="fulfillmentFeeUsd" type="number" step="0.0001" readonly />
+          </div>
+
+          <div class="field">
+            <label for="freightType">运费类型</label>
+            <select id="freightType">
+              <option value="air">空运（CNY/g）</option>
+              <option value="sea">海运（CNY/CBM）</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="airFreightPerGram">空运费(CNY/g)</label>
+            <input id="airFreightPerGram" type="number" step="0.000001" value="0.050881" />
+          </div>
+
+          <div class="field">
+            <label for="seaFreightPerCbm">海运费(CNY/CBM)</label>
+            <input id="seaFreightPerCbm" type="number" step="0.0001" value="0" />
+          </div>
+
+          <div class="field">
+            <label for="lengthM">长(m)</label>
+            <input id="lengthM" type="number" step="0.0001" value="0" />
+          </div>
+
+          <div class="field">
+            <label for="widthM">宽(m)</label>
+            <input id="widthM" type="number" step="0.0001" value="0" />
+          </div>
+
+          <div class="field">
+            <label for="heightM">高(m)</label>
+            <input id="heightM" type="number" step="0.0001" value="0" />
+          </div>
+
+          <div class="field">
+            <label for="volumeCbm">体积(CBM，自动)</label>
+            <input id="volumeCbm" type="number" step="0.000001" value="0" readonly />
+            <div class="field-help">CBM = 长 × 宽 × 高</div>
+          </div>
+
+          <div class="field full">
+            <label>汇率锁定</label>
+            <div class="switch-row">
+              <div class="switch-label-group">
+                <div class="switch-title">锁定汇率</div>
+                <div class="switch-desc">开启后，恢复默认时汇率不会被一起重置</div>
+              </div>
+              <label class="switch" for="lockRates">
+                <input id="lockRates" type="checkbox" checked />
+                <span class="slider"></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="usdCny">汇率 USD-CNY</label>
+            <input id="usdCny" type="number" step="0.0001" value="6.97" />
+          </div>
+
+          <div class="field">
+            <label for="usdNgn">汇率 USD-NGN</label>
+            <input id="usdNgn" type="number" step="0.0001" value="1422.68" />
+          </div>
+
+          <div class="field">
+            <label for="cnyNgn">汇率 CNY-NGN</label>
+            <input id="cnyNgn" type="number" step="0.0001" value="203.67" />
+          </div>
         </div>
+
         <div class="actions">
-          <button class="primary" id="calculateBtn">立即计算</button>
-          <button class="primary" id="saveProductBtn">确认选品</button>
-          <button class="ghost" id="resetBtn">恢复默认</button>
+          <button class="primary" id="calculateBtn" type="button">立即计算</button>
+          <button class="primary" id="saveProductBtn" type="button">确认选品</button>
+          <button class="ghost" id="resetBtn" type="button">恢复默认</button>
         </div>
-        <div class="status" id="statusText">当前使用的是 2026 年数据。点击“确认选品”后，会把当前结果保存到选品表单页。</div>
+
+        <div class="status" id="statusText">当前使用 2026 年数据。点击“确认选品”后，会把当前结果保存到选品表单页。</div>
       </section>
+
       <section class="panel">
-        <h2>计算结果</h2>
+        <div class="panel-head">
+          <h2>计算结果</h2>
+          <div class="hint">利润项为绿色表示为正，红色表示为负。</div>
+        </div>
+
         <div class="metrics">
-          <div class="metric"><div class="label">前台定价(CNY)</div><div class="value" id="priceCny">0.00</div><div class="hint">竞品 NGN 售价按汇率换算</div></div>
+          <div class="metric"><div class="label">前台定价(CNY)</div><div class="value" id="priceCny">0.00</div><div class="hint">竞品 NGN 售价按 CNY 汇率换算</div></div>
           <div class="metric"><div class="label">前台定价(NGN)</div><div class="value" id="priceNgn">0.00</div><div class="hint">当前前台定价 NGN</div></div>
           <div class="metric"><div class="label">前台定价(USD)</div><div class="value" id="priceUsd">0.00</div><div class="hint">竞品 NGN 售价按 USD 汇率换算</div></div>
-          <div class="metric"><div class="label">运费(CNY)</div><div class="value" id="airFreightCny">0.00</div><div class="hint">重量 × 空运费</div></div>
+          <div class="metric"><div class="label">运费(CNY)</div><div class="value" id="airFreightCny">0.00</div><div class="hint" id="freightHint">重量 × 空运费</div></div>
           <div class="metric"><div class="label">仓储费(CNY)</div><div class="value" id="warehouseCny">0.00</div><div class="hint">仓储费(USD/天) × 天数 × USD-CNY</div></div>
           <div class="metric"><div class="label">妥投出库费(CNY)</div><div class="value" id="fulfillmentCny">0.00</div><div class="hint">出库费(USD) × USD-CNY</div></div>
-          <div class="metric"><div class="label">毛利率</div><div class="value" id="grossMargin">0.00%</div><div class="hint">(售价-成本)/售价</div></div>
+          <div class="metric"><div class="label">毛利率</div><div class="value" id="grossMargin">0.00%</div><div class="hint">(售价 - 成本) / 售价</div></div>
           <div class="metric"><div class="label">利润(CNY，不含税)</div><div class="value" id="profitNoTax">0.00</div><div class="hint">扣佣金、退货、物流、仓储、出库后</div></div>
           <div class="metric"><div class="label">利润率(不含税)</div><div class="value" id="profitRateNoTax">0.00%</div><div class="hint">利润 / 售价</div></div>
           <div class="metric"><div class="label">利润(CNY，扣税后)</div><div class="value" id="profitAfterTax">0.00</div><div class="hint">加入 HK 税率后</div></div>
           <div class="metric"><div class="label">利润率(扣税后)</div><div class="value" id="profitRateAfterTax">0.00%</div><div class="hint">税后利润 / 售价</div></div>
         </div>
+
+        <div class="formula-box">
+          <h3>核心逻辑</h3>
+          <code>税后利润 = 售价(CNY) - 售价 × (退货率 + 佣金率 + 税率) - 运费 - 仓储费 - 妥投出库费 - 成本</code>
+        </div>
       </section>
     </div>
   </div>
+
   <script>
-    const categoryCommission2026={'Auto & Moto / 汽车与摩托车':0.20,'Baby Products / 婴儿用品':0.20,'Beauty Appliances / 美容电器':0.15,'Books, Movies & Music / 图书、影视与音乐':0.20,'Cameras / 相机':0.10,'Electronics Accessories / 电子配件':0.20,'Fashion / 时尚':0.20,'Fashion Accessories / 时尚配饰':0.20,'Generators / 发电机':0.11,'Grocery / 食品杂货':0.20,'Health & Beauty / 健康与美容':0.20,'Home / 家居用品':0.20,'Laptops, Desktops & Monitors / 笔记本电脑、台式机及显示器':0.10,'Large Appliances / 大型家电':0.10,'Luggage & Travel Gear / 箱包与旅行装备':0.20,'Mobile Phones / 移动电话':0.06,'Musical Instruments / 乐器':0.20,'Small Appliances / 小型家电':0.12,'Sporting Goods / 体育用品':0.20,'Sportswear / 运动服饰':0.17,'Tablets / 平板电脑':0.11,'Televisions / 电视机':0.08,'Toys & Games / 玩具与游戏':0.15};
-    const outboundFee2026={'Large / 大号':2.5,'Medium / 中号':0.9,'Small - Fashion / 小号-时尚类':0.25,'Small - Sportswear / 小号-运动服饰类':0.25,'Small - Home / 小号-家居用品类':0.25,'Small - Others / 小号-其他类':0.4};
-    const storageFee2026={'Xtra Small / 超小':0.00203,'Small / 小':0.00709,'Medium / 中':0.01890,'TV / 电视':0.05000,'Large / 大':0.05000};
-    const defaults={category:'Fashion / 时尚',outboundTier:'Small - Fashion / 小号-时尚类',storageTier:'Small / 小',costCny:2.70,weightG:45,competitorNgn:6500,returnRate:0.028,taxRate:0.085,storageDays:7,airFreightPerGram:0.050881,usdCny:6.97,usdNgn:1422.68,cnyNgn:203.67};
-    const $=id=>document.getElementById(id);
-    function fillSelect(id,options,selectedValue){$(id).innerHTML=Object.entries(options).map(([label])=>`<option value="${label}" ${label===selectedValue?'selected':''}>${label}</option>`).join('');}
-    function formatMoney(num){return Number(num||0).toFixed(2);} function formatPercent(num){return `${(Number(num||0)*100).toFixed(2)}%`;}
-    function setMetric(id,value,isPercent=false){const el=$(id);el.textContent=isPercent?formatPercent(value):formatMoney(value);el.classList.remove('good','bad');if(id.toLowerCase().includes('profit')){if(value>0)el.classList.add('good');if(value<0)el.classList.add('bad');}}
-    function syncAutoFields(){$('commissionRate').value=categoryCommission2026[$('category').value]??0;$('fulfillmentFeeUsd').value=outboundFee2026[$('outboundTier').value]??0;$('warehouseFeeUsdPerDay').value=storageFee2026[$('storageTier').value]??0;$('statusText').textContent=`当前使用 2026 规则：类目=${$('category').value}，出库档位=${$('outboundTier').value}，仓储档位=${$('storageTier').value}`;}
-    function readNumber(id){return Number($(id).value||0);}
-    function calculate(){syncAutoFields();const costCny=readNumber('costCny');const weightG=readNumber('weightG');const competitorNgn=readNumber('competitorNgn');const commissionRate=readNumber('commissionRate');const returnRate=readNumber('returnRate');const taxRate=readNumber('taxRate');const warehouseFeeUsdPerDay=readNumber('warehouseFeeUsdPerDay');const storageDays=readNumber('storageDays');const fulfillmentFeeUsd=readNumber('fulfillmentFeeUsd');const airFreightPerGram=readNumber('airFreightPerGram');const usdCny=readNumber('usdCny');const usdNgn=readNumber('usdNgn');const cnyNgn=readNumber('cnyNgn');const priceCny=cnyNgn?competitorNgn/cnyNgn:0;const priceNgn=competitorNgn;const priceUsd=usdNgn?competitorNgn/usdNgn:0;const airFreightCny=weightG*airFreightPerGram;const warehouseCny=warehouseFeeUsdPerDay*storageDays*usdCny;const fulfillmentCny=fulfillmentFeeUsd*usdCny;const grossMargin=priceCny?(priceCny-costCny)/priceCny:0;const profitNoTax=priceCny-priceCny*(returnRate+commissionRate)-airFreightCny-warehouseCny-fulfillmentCny-costCny;const profitRateNoTax=priceCny?profitNoTax/priceCny:0;const profitAfterTax=priceCny-priceCny*(returnRate+commissionRate+taxRate)-airFreightCny-warehouseCny-fulfillmentCny-costCny;const profitRateAfterTax=priceCny?profitAfterTax/priceCny:0;setMetric('priceCny',priceCny);setMetric('priceNgn',priceNgn);setMetric('priceUsd',priceUsd);setMetric('airFreightCny',airFreightCny);setMetric('warehouseCny',warehouseCny);setMetric('fulfillmentCny',fulfillmentCny);setMetric('grossMargin',grossMargin,true);setMetric('profitNoTax',profitNoTax);setMetric('profitRateNoTax',profitRateNoTax,true);setMetric('profitAfterTax',profitAfterTax);setMetric('profitRateAfterTax',profitRateAfterTax,true);}
-    function saveCurrentProduct(){calculate();const payload={selectedAt:new Date().toISOString(),category:$('category').value,outboundTier:$('outboundTier').value,storageTier:$('storageTier').value,costCny:readNumber('costCny'),weightG:readNumber('weightG'),competitorNgn:readNumber('competitorNgn'),commissionRate:readNumber('commissionRate'),returnRate:readNumber('returnRate'),taxRate:readNumber('taxRate'),warehouseFeeUsdPerDay:readNumber('warehouseFeeUsdPerDay'),storageDays:readNumber('storageDays'),fulfillmentFeeUsd:readNumber('fulfillmentFeeUsd'),airFreightPerGram:readNumber('airFreightPerGram'),usdCny:readNumber('usdCny'),usdNgn:readNumber('usdNgn'),cnyNgn:readNumber('cnyNgn'),priceCny:$('priceCny').textContent,priceNgn:$('priceNgn').textContent,priceUsd:$('priceUsd').textContent,airFreightCny:$('airFreightCny').textContent,warehouseCny:$('warehouseCny').textContent,fulfillmentCny:$('fulfillmentCny').textContent,grossMargin:$('grossMargin').textContent,profitNoTax:$('profitNoTax').textContent,profitRateNoTax:$('profitRateNoTax').textContent,profitAfterTax:$('profitAfterTax').textContent,profitRateAfterTax:$('profitRateAfterTax').textContent};localStorage.setItem('jumia_selected_product_draft',JSON.stringify(payload));window.location.href='./selected_product_form.html';}
-    function init(){fillSelect('category',categoryCommission2026,defaults.category);fillSelect('outboundTier',outboundFee2026,defaults.outboundTier);fillSelect('storageTier',storageFee2026,defaults.storageTier);$('costCny').value=defaults.costCny;$('weightG').value=defaults.weightG;$('competitorNgn').value=defaults.competitorNgn;$('returnRate').value=defaults.returnRate;$('taxRate').value=defaults.taxRate;$('storageDays').value=defaults.storageDays;$('airFreightPerGram').value=defaults.airFreightPerGram;$('usdCny').value=defaults.usdCny;$('usdNgn').value=defaults.usdNgn;$('cnyNgn').value=defaults.cnyNgn;['category','outboundTier','storageTier','costCny','weightG','competitorNgn','returnRate','taxRate','storageDays','airFreightPerGram','usdCny','usdNgn','cnyNgn'].forEach(id=>$(id).addEventListener('input',calculate));$('calculateBtn').addEventListener('click',calculate);$('saveProductBtn').addEventListener('click',saveCurrentProduct);$('resetBtn').addEventListener('click',()=>init());calculate();}
+    const categoryCommission2026 = {
+      'Auto & Moto / 汽车与摩托车': 0.20,
+      'Baby Products / 婴儿用品': 0.20,
+      'Beauty Appliances / 美容电器': 0.15,
+      'Books, Movies & Music / 图书、影视与音乐': 0.20,
+      'Cameras / 相机': 0.10,
+      'Electronics Accessories / 电子配件': 0.20,
+      'Fashion / 时尚': 0.20,
+      'Fashion Accessories / 时尚配饰': 0.20,
+      'Generators / 发电机': 0.11,
+      'Grocery / 食品杂货': 0.20,
+      'Health & Beauty / 健康与美容': 0.20,
+      'Home / 家居用品': 0.20,
+      'Laptops, Desktops & Monitors / 笔记本电脑、台式机及显示器': 0.10,
+      'Large Appliances / 大型家电': 0.10,
+      'Luggage & Travel Gear / 箱包与旅行装备': 0.20,
+      'Mobile Phones / 移动电话': 0.06,
+      'Musical Instruments / 乐器': 0.20,
+      'Small Appliances / 小型家电': 0.12,
+      'Sporting Goods / 体育用品': 0.20,
+      'Sportswear / 运动服饰': 0.17,
+      'Tablets / 平板电脑': 0.11,
+      'Televisions / 电视机': 0.08,
+      'Toys & Games / 玩具与游戏': 0.15
+    };
+
+    const outboundFee2026 = {
+      'Large / 大号': 2.5,
+      'Medium / 中号': 0.9,
+      'Small - Fashion / 小号-时尚类': 0.25,
+      'Small - Sportswear / 小号-运动服饰类': 0.25,
+      'Small - Home / 小号-家居用品类': 0.25,
+      'Small - Others / 小号-其他类': 0.4
+    };
+
+    const storageFee2026 = {
+      'Xtra Small / 超小': 0.00203,
+      'Small / 小': 0.00709,
+      'Medium / 中': 0.0189,
+      'TV / 电视': 0.05,
+      'Large / 大': 0.05
+    };
+
+    const defaults = {
+      category: 'Fashion / 时尚',
+      outboundTier: 'Small - Fashion / 小号-时尚类',
+      storageTier: 'Small / 小',
+      costCny: 2.70,
+      weightG: 45,
+      competitorNgn: 6500,
+      returnRate: 0.028,
+      taxRate: 0.085,
+      storageDays: 7,
+      freightType: 'air',
+      airFreightPerGram: 0.050881,
+      seaFreightPerCbm: 0,
+      lengthM: 0,
+      widthM: 0,
+      heightM: 0,
+      volumeCbm: 0,
+      lockRates: true,
+      usdCny: 6.97,
+      usdNgn: 1422.68,
+      cnyNgn: 203.67
+    };
+
+    const rateDefaults = {
+      lockRates: defaults.lockRates,
+      usdCny: defaults.usdCny,
+      usdNgn: defaults.usdNgn,
+      cnyNgn: defaults.cnyNgn
+    };
+
+    const STORAGE_KEY = 'pricing_profit_calculator_form_data_v1';
+    const $ = (id) => document.getElementById(id);
+
+    function fillSelect(id, options, selectedValue) {
+      $(id).innerHTML = Object.entries(options)
+        .map(([label]) => `<option value="${label}" ${label === selectedValue ? 'selected' : ''}>${label}</option>`)
+        .join('');
+    }
+
+    function formatMoney(num) {
+      return Number(num || 0).toFixed(2);
+    }
+
+    function formatPercent(num) {
+      return `${(Number(num || 0) * 100).toFixed(2)}%`;
+    }
+
+    function setMetric(id, value, isPercent = false) {
+      const el = $(id);
+      el.textContent = isPercent ? formatPercent(value) : formatMoney(value);
+      el.classList.remove('good', 'bad');
+      if (id.toLowerCase().includes('profit')) {
+        if (value > 0) el.classList.add('good');
+        if (value < 0) el.classList.add('bad');
+      }
+    }
+
+    function setStatus(message) {
+      $('statusText').textContent = message;
+    }
+
+    function readNumber(id) {
+      return Number($(id).value || 0);
+    }
+
+    function getCurrentFormData() {
+      return {
+        category: $('category').value,
+        outboundTier: $('outboundTier').value,
+        storageTier: $('storageTier').value,
+        costCny: $('costCny').value,
+        weightG: $('weightG').value,
+        competitorNgn: $('competitorNgn').value,
+        returnRate: $('returnRate').value,
+        taxRate: $('taxRate').value,
+        storageDays: $('storageDays').value,
+        freightType: $('freightType').value,
+        lockRates: $('lockRates').checked,
+        airFreightPerGram: $('airFreightPerGram').value,
+        seaFreightPerCbm: $('seaFreightPerCbm').value,
+        lengthM: $('lengthM').value,
+        widthM: $('widthM').value,
+        heightM: $('heightM').value,
+        volumeCbm: $('volumeCbm').value,
+        usdCny: $('usdCny').value,
+        usdNgn: $('usdNgn').value,
+        cnyNgn: $('cnyNgn').value
+      };
+    }
+
+    function saveRateDefaults() {
+      localStorage.setItem('pricing_profit_calculator_rate_defaults_v1', JSON.stringify({
+        lockRates: $('lockRates').checked,
+        usdCny: $('usdCny').value,
+        usdNgn: $('usdNgn').value,
+        cnyNgn: $('cnyNgn').value
+      }));
+    }
+
+    function loadRateDefaults() {
+      const raw = localStorage.getItem('pricing_profit_calculator_rate_defaults_v1');
+      if (!raw) return;
+
+      try {
+        const saved = JSON.parse(raw);
+        rateDefaults.lockRates = saved.lockRates ?? rateDefaults.lockRates;
+        rateDefaults.usdCny = saved.usdCny ?? rateDefaults.usdCny;
+        rateDefaults.usdNgn = saved.usdNgn ?? rateDefaults.usdNgn;
+        rateDefaults.cnyNgn = saved.cnyNgn ?? rateDefaults.cnyNgn;
+      } catch (error) {
+        console.error('读取汇率默认值失败:', error);
+      }
+    }
+
+    function saveFormData() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(getCurrentFormData()));
+      saveRateDefaults();
+    }
+
+    function loadSavedFormData() {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return false;
+
+      try {
+        const saved = JSON.parse(raw);
+        Object.entries(saved).forEach(([key, value]) => {
+          if ($(key) && value !== undefined && value !== null) {
+            if ($(key).type === 'checkbox') {
+              $(key).checked = Boolean(value);
+            } else {
+              $(key).value = value;
+            }
+          }
+        });
+        return true;
+      } catch (error) {
+        console.error('读取本地表单数据失败:', error);
+        return false;
+      }
+    }
+
+    function syncAutoFields() {
+      $('commissionRate').value = categoryCommission2026[$('category').value] ?? 0;
+      $('fulfillmentFeeUsd').value = outboundFee2026[$('outboundTier').value] ?? 0;
+      $('warehouseFeeUsdPerDay').value = storageFee2026[$('storageTier').value] ?? 0;
+      $('summaryCategory').textContent = $('category').value || '-';
+      $('summaryCompetitorPrice').textContent = $('competitorNgn').value ? `${formatMoney($('competitorNgn').value)} NGN` : '-';
+
+      const lengthM = readNumber('lengthM');
+      const widthM = readNumber('widthM');
+      const heightM = readNumber('heightM');
+      $('volumeCbm').value = (lengthM * widthM * heightM).toFixed(6);
+
+      const isAir = $('freightType').value === 'air';
+      $('airFreightPerGram').disabled = !isAir;
+      $('weightG').disabled = !isAir;
+      $('seaFreightPerCbm').disabled = isAir;
+      $('lengthM').disabled = isAir;
+      $('widthM').disabled = isAir;
+      $('heightM').disabled = isAir;
+      $('freightHint').textContent = isAir ? '重量 × 空运费' : 'CBM × 海运费';
+
+      setStatus(`当前使用 2026 规则：类目=${$('category').value}，出库档位=${$('outboundTier').value}，仓储档位=${$('storageTier').value}，运费类型=${isAir ? '空运' : '海运'}`);
+    }
+
+    function updateDecision(profitRateAfterTax) {
+      $('summaryProfitRateAfterTax').textContent = formatPercent(profitRateAfterTax);
+      if (profitRateAfterTax >= 0.25) {
+        $('summaryDecision').textContent = '可优先推进';
+        $('summaryDecision').className = 'summary-value good';
+      } else if (profitRateAfterTax >= 0.1) {
+        $('summaryDecision').textContent = '可继续评估';
+        $('summaryDecision').className = 'summary-value';
+      } else {
+        $('summaryDecision').textContent = '谨慎上架';
+        $('summaryDecision').className = 'summary-value bad';
+      }
+    }
+
+    function calculate() {
+      syncAutoFields();
+
+      const costCny = readNumber('costCny');
+      const weightG = readNumber('weightG');
+      const competitorNgn = readNumber('competitorNgn');
+      const commissionRate = readNumber('commissionRate');
+      const returnRate = readNumber('returnRate');
+      const taxRate = readNumber('taxRate');
+      const warehouseFeeUsdPerDay = readNumber('warehouseFeeUsdPerDay');
+      const storageDays = readNumber('storageDays');
+      const fulfillmentFeeUsd = readNumber('fulfillmentFeeUsd');
+      const freightType = $('freightType').value;
+      const airFreightPerGram = readNumber('airFreightPerGram');
+      const seaFreightPerCbm = readNumber('seaFreightPerCbm');
+      const volumeCbm = readNumber('volumeCbm');
+      const usdCny = readNumber('usdCny');
+      const usdNgn = readNumber('usdNgn');
+      const cnyNgn = readNumber('cnyNgn');
+
+      const priceCny = cnyNgn ? competitorNgn / cnyNgn : 0;
+      const priceNgn = competitorNgn;
+      const priceUsd = usdNgn ? competitorNgn / usdNgn : 0;
+      const airFreightCny = freightType === 'air'
+        ? weightG * airFreightPerGram
+        : volumeCbm * seaFreightPerCbm;
+      const warehouseCny = warehouseFeeUsdPerDay * storageDays * usdCny;
+      const fulfillmentCny = fulfillmentFeeUsd * usdCny;
+      const grossMargin = priceCny ? (priceCny - costCny) / priceCny : 0;
+      const profitNoTax = priceCny - priceCny * (returnRate + commissionRate) - airFreightCny - warehouseCny - fulfillmentCny - costCny;
+      const profitRateNoTax = priceCny ? profitNoTax / priceCny : 0;
+      const profitAfterTax = priceCny - priceCny * (returnRate + commissionRate + taxRate) - airFreightCny - warehouseCny - fulfillmentCny - costCny;
+      const profitRateAfterTax = priceCny ? profitAfterTax / priceCny : 0;
+
+      setMetric('priceCny', priceCny);
+      setMetric('priceNgn', priceNgn);
+      setMetric('priceUsd', priceUsd);
+      setMetric('airFreightCny', airFreightCny);
+      setMetric('warehouseCny', warehouseCny);
+      setMetric('fulfillmentCny', fulfillmentCny);
+      setMetric('grossMargin', grossMargin, true);
+      setMetric('profitNoTax', profitNoTax);
+      setMetric('profitRateNoTax', profitRateNoTax, true);
+      setMetric('profitAfterTax', profitAfterTax);
+      setMetric('profitRateAfterTax', profitRateAfterTax, true);
+      updateDecision(profitRateAfterTax);
+      saveFormData();
+    }
+
+    function saveCurrentProduct() {
+      calculate();
+      const lengthM = readNumber('lengthM');
+      const widthM = readNumber('widthM');
+      const heightM = readNumber('heightM');
+      const volumeCbm = readNumber('volumeCbm');
+      const freightType = $('freightType').value;
+      const weightG = readNumber('weightG');
+
+      const payload = {
+        selectedAt: new Date().toISOString(),
+        category: $('category').value,
+        outboundTier: $('outboundTier').value,
+        storageTier: $('storageTier').value,
+        costCny: readNumber('costCny'),
+        weightG,
+        weight: weightG ? `${weightG}g` : '',
+        competitorNgn: readNumber('competitorNgn'),
+        commissionRate: readNumber('commissionRate'),
+        returnRate: readNumber('returnRate'),
+        taxRate: readNumber('taxRate'),
+        warehouseFeeUsdPerDay: readNumber('warehouseFeeUsdPerDay'),
+        storageDays: readNumber('storageDays'),
+        fulfillmentFeeUsd: readNumber('fulfillmentFeeUsd'),
+        freightType,
+        airFreightPerGram: readNumber('airFreightPerGram'),
+        seaFreightPerCbm: readNumber('seaFreightPerCbm'),
+        lengthM,
+        widthM,
+        heightM,
+        volumeCbm,
+        volume: volumeCbm ? `${volumeCbm.toFixed(6)} CBM` : '',
+        dimensions: lengthM && widthM && heightM ? `${lengthM} × ${widthM} × ${heightM} m` : '',
+        usdCny: readNumber('usdCny'),
+        usdNgn: readNumber('usdNgn'),
+        cnyNgn: readNumber('cnyNgn'),
+        priceCny: $('priceCny').textContent,
+        priceNgn: $('priceNgn').textContent,
+        priceUsd: $('priceUsd').textContent,
+        airFreightCny: $('airFreightCny').textContent,
+        warehouseCny: $('warehouseCny').textContent,
+        fulfillmentCny: $('fulfillmentCny').textContent,
+        grossMargin: $('grossMargin').textContent,
+        profitNoTax: $('profitNoTax').textContent,
+        profitRateNoTax: $('profitRateNoTax').textContent,
+        profitAfterTax: $('profitAfterTax').textContent,
+        profitRateAfterTax: $('profitRateAfterTax').textContent
+      };
+
+      localStorage.setItem('jumia_selected_product_draft', JSON.stringify(payload));
+      window.location.href = './selected_product_form.html';
+    }
+
+    function applyDefaults() {
+      fillSelect('category', categoryCommission2026, defaults.category);
+      fillSelect('outboundTier', outboundFee2026, defaults.outboundTier);
+      fillSelect('storageTier', storageFee2026, defaults.storageTier);
+      $('costCny').value = defaults.costCny;
+      $('weightG').value = defaults.weightG;
+      $('freightType').value = defaults.freightType;
+      $('competitorNgn').value = defaults.competitorNgn;
+      $('returnRate').value = defaults.returnRate;
+      $('taxRate').value = defaults.taxRate;
+      $('storageDays').value = defaults.storageDays;
+      $('airFreightPerGram').value = defaults.airFreightPerGram;
+      $('seaFreightPerCbm').value = defaults.seaFreightPerCbm;
+      $('lengthM').value = defaults.lengthM;
+      $('widthM').value = defaults.widthM;
+      $('heightM').value = defaults.heightM;
+      $('volumeCbm').value = defaults.volumeCbm;
+      $('lockRates').checked = Boolean(rateDefaults.lockRates);
+      if ($('lockRates').checked) {
+        $('usdCny').value = rateDefaults.usdCny;
+        $('usdNgn').value = rateDefaults.usdNgn;
+        $('cnyNgn').value = rateDefaults.cnyNgn;
+      } else {
+        $('usdCny').value = defaults.usdCny;
+        $('usdNgn').value = defaults.usdNgn;
+        $('cnyNgn').value = defaults.cnyNgn;
+      }
+    }
+
+    function init() {
+      loadRateDefaults();
+      applyDefaults();
+      ['category', 'outboundTier', 'storageTier', 'costCny', 'weightG', 'competitorNgn', 'returnRate', 'taxRate', 'storageDays', 'freightType', 'airFreightPerGram', 'seaFreightPerCbm', 'lengthM', 'widthM', 'heightM', 'usdCny', 'usdNgn', 'cnyNgn'].forEach((id) => {
+        $(id).addEventListener('input', calculate);
+        $(id).addEventListener('change', calculate);
+      });
+      $('lockRates').addEventListener('change', () => {
+        saveFormData();
+        calculate();
+      });
+      $('calculateBtn').addEventListener('click', calculate);
+      $('saveProductBtn').addEventListener('click', saveCurrentProduct);
+      $('resetBtn').addEventListener('click', () => {
+        applyDefaults();
+        calculate();
+        saveFormData();
+      });
+
+      const hasSavedData = loadSavedFormData();
+      if (!hasSavedData) {
+        applyDefaults();
+      }
+      calculate();
+    }
+
     init();
   </script>
 </body>
